@@ -18,7 +18,7 @@ func main() {
 	defer conn.Close()
 
 	// Medir o tempo de resposta (RTT) para N solicitações
-	numRequests := 2
+	numRequests := 10000
 	totalDuration := time.Duration(0)
 
 	for i := 0; i < numRequests; i++ {
@@ -26,7 +26,7 @@ func main() {
 
 		// Envie a solicitação para o servidor
 		request := "solicitação\n"
-		print("Cliente mandou: " + request)
+		// print("Cliente mandou: " + request)
 		_, err := conn.Write([]byte(request))
 		if err != nil {
 			fmt.Println("Erro ao enviar solicitação: ", err)

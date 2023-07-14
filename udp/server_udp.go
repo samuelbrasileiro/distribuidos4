@@ -32,7 +32,7 @@ func handleUDPConnection(conn *net.UDPConn) {
 }
 
 func main() {
-	addr, err := net.ResolveUDPAddr("udp", ":8080")
+	addr, err := net.ResolveUDPAddr("udp", ":8082")
 	if err != nil {
 		fmt.Println("Erro ao resolver endereço:", err)
 		return

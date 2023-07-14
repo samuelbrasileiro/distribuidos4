@@ -14,7 +14,7 @@ func handleConnection(conn net.Conn) {
 	buffer := make([]byte, 1024)
 	for {
 		// Receba a solicitação do cliente
-		n, err := conn.Read(buffer)
+		_, err := conn.Read(buffer)
 		if err != nil {
 			if err == io.EOF {
 				// Cliente encerrou a conexão
@@ -26,8 +26,8 @@ func handleConnection(conn net.Conn) {
 		}
 
 		// Processar a solicitação do cliente
-		request := string(buffer[:n])
-		print("Servidor recebeu: " + request)
+		// request := string(buffer[:n])
+		// print("Servidor recebeu: " + request)
 
 		// Envie a resposta para o cliente
 		response := "Resposta\n"
