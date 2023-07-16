@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"os"
 )
 
 func handleConnection(conn net.Conn) {
@@ -14,48 +15,62 @@ func handleConnection(conn net.Conn) {
 	buffer := make([]byte, 1024)
 	for {
 		// Receba a solicitação do cliente
-		n, err := conn.Read(buffer)
+		_, err := conn.Read(buffer)
 		if err != nil {
 			if err == io.EOF {
 				// Cliente encerrou a conexão
 				fmt.Println("Cliente encerrou a conexão.")
 				return
 			}
-			fmt.Println("Erro ao receber solicitação:", err)
+			fmt.Println("Erro ao receber solicitação")
 			return
 		}
 
 		// Processar a solicitação do cliente
-		request := string(buffer[:n])
-		print("Servidor recebeu: " + request)
+		// request := string(buffer[:n])
+		// print("Servidor recebeu: " + request)
 
 		// Envie a resposta para o cliente
 		response := "Resposta\n"
 		_, err = conn.Write([]byte(response))
 		if err != nil {
-			fmt.Println("Erro ao enviar resposta:", err)
+			fmt.Println("Erro ao enviar resposta")
 			return
 		}
 	}
-	conn.Close()
+	
+	// Fecha Conexão
+	defer func(conn net.Conn) {
+		err := conn.Close()
+		if err != nil {
+			fmt.Println("Erro ao fechar conexão")
+			os.Exit(0)
+		}
+	}(conn)
 
 }
 
 func main() {
-	listener, err := net.Listen("tcp", ":8080")
+	// Define o endpoint do servidor TCP
+	r, err := net.ResolveTCPAddr("tcp", ":8080")
 	if err != nil {
-		fmt.Println("Erro ao iniciar o servidor:", err)
+		fmt.Println("Erro ao iniciar o servidor")
 		return
 	}
 
-	defer listener.Close()
+	// Cria umlistener TCP
+	listener, errListener := net.ListenTCP("tcp", r)
+	if errListener != nil {
+		fmt.Println("Erro ao criar um listener TCP")
+		return
+	}
 
 	fmt.Println("Servidor TCP aguardando conexões...")
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("Erro ao aceitar conexão:", err)
+			fmt.Println("Erro ao aceitar conexão")
 			continue
 		}
 
