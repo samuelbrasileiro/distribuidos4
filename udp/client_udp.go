@@ -9,7 +9,16 @@ import (
 	"os"
 	"time"
 	"math"
+	"math/rand"
+	"encoding/json"
 )
+
+
+type Pokemon struct {
+	Name  string
+	Type  string
+	Level int
+}
 
 func main() {
 	args := os.Args[1:2] // Ignorar o primeiro argumento, que é o nome do executável
@@ -35,21 +44,44 @@ func main() {
 		var totalRTT time.Duration
 		for j := 0; j < numRequests; j++ {
 			start := time.Now()
-			// Enviar solicitação para o servidor
-			req := []byte("Solicitação do cliente")
+			// Gerador de números aleatórios com base na hora atual
+			rand.Seed(time.Now().UnixNano())
+			// Gerar um número aleatório entre 0 e 149
+			randomNumber := rand.Intn(150)
+
+			// Enviar solicitação para o servidor para retornar um pokemon
+			// Convertendo o número inteiro em um slice de bytes
+			req := make([]byte, 4)
+			req[0] = byte(randomNumber >> 24)
+			req[1] = byte(randomNumber >> 16)
+			req[2] = byte(randomNumber >> 8)
+			req[3] = byte(randomNumber)
 			_, err := conn.Write(req)
 			if err != nil {
 				fmt.Println("Erro ao tentar enviar request:", err)
 				os.Exit(0)
 			}
 
-			// Receber resposta do servidor
+			// Receber resposta do servidor que é um objeto com informações de um pokemon
 			rep := make([]byte, 1024)
-			_, _, errResp := conn.ReadFromUDP(rep)
+			n, _, errResp := conn.ReadFromUDP(rep)
 			if errResp != nil {
 				fmt.Println("Erro ao receber resposta do servidor:", errResp)
 				os.Exit(0)
 			}
+
+			// Desserializando a resposta para criar um novo objeto Pokemon
+			var pokemon Pokemon
+			errDess := json.Unmarshal(rep[:n], &pokemon)
+			if errDess != nil {
+				fmt.Println("Erro ao desserializar a resposta do servidor:", errDess)
+				os.Exit(1)
+			}
+
+			// fmt.Printf("Name: %s\n", pokemon.Name)
+			// fmt.Printf("Type: %s\n", pokemon.Type)
+			// fmt.Printf("Level: %d\n", pokemon.Level)
+			// fmt.Println("------------------------")
 
 			// Calcular o tempo de resposta
 			RTT := time.Since(start)
@@ -74,23 +106,45 @@ func main() {
 
 	} else {
 		for j := 0; j < numRequests; j++ {
-			// Enviar solicitação para o servidor
-			req := []byte("Solicitação do cliente")
+			// Gerador de números aleatórios com base na hora atual
+			rand.Seed(time.Now().UnixNano())
+			// Gerar um número aleatório entre 0 e 149
+			randomNumber := rand.Intn(150)
+
+			// Enviar solicitação para o servidor para retornar um pokemo
+			// Convertendo o número inteiro em um slice de bytes
+			req := make([]byte, 4)
+			req[0] = byte(randomNumber >> 24)
+			req[1] = byte(randomNumber >> 16)
+			req[2] = byte(randomNumber >> 8)
+			req[3] = byte(randomNumber)
 			_, err := conn.Write(req)
 			if err != nil {
 				fmt.Println("Erro ao tentar enviar request:", err)
 				os.Exit(0)
 			}
 
-			// Receber resposta do servidor
+			// Receber resposta do servidor que é um objeto com informações de um pokemon
 			rep := make([]byte, 1024)
-			_, _, errResp := conn.ReadFromUDP(rep)
+			n, _, errResp := conn.ReadFromUDP(rep)
 			if errResp != nil {
 				fmt.Println("Erro ao receber resposta do servidor:", errResp)
 				os.Exit(0)
 			}
 
-		}
+			// Desserializando a resposta para criar um novo objeto Pokemon
+			var pokemon Pokemon
+			errDess := json.Unmarshal(rep[:n], &pokemon)
+			if errDess != nil {
+				fmt.Println("Erro ao desserializar a resposta do servidor:", errDess)
+				os.Exit(1)
+			}
 
+			// fmt.Printf("Name: %s\n", pokemon.Name)
+			// fmt.Printf("Type: %s\n", pokemon.Type)
+			// fmt.Printf("Level: %d\n", pokemon.Level)
+			// fmt.Println("------------------------")
+
+		}
 	}
 }

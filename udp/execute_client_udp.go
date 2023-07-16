@@ -13,7 +13,7 @@ func main() {
 	// Iniciar vários processos
 	for i := 0; i < numProcesses; i++ {
 		// No windows é necessário passar o caminho todo, no linux um ./ resolve linux >>>
-		cmd := exec.Command("./client_udp.exe", fmt.Sprintf("%d", i))
+		cmd := exec.Command("C:/Users/washi/Documents/Go/distribuidos4/udp/client_udp.exe", fmt.Sprintf("%d", i))
 
 		// Redirecionar a saída padrão do processo para a saída padrão do programa
 		cmd.Stdout = os.Stdout

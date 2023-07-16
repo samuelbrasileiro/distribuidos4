@@ -6,21 +6,30 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"net"
-	"os"
 	"time"
+	"os"
+	"math"
+	"math/rand"
+	"encoding/json"
 )
+
+
+type Pokemon struct {
+	Name  string
+	Type  string
+	Level int
+}
 
 func main() {
 	args := os.Args[1:2] // Ignorar o primeiro argumento, que é o nome do executável
-
+	
 	// Retorna o endereço do endpoint TCP
 	r, err := net.ResolveTCPAddr("tcp", ":8080")
 	if err != nil {
 		fmt.Println("Erro ao buscar endereço do endpoint TCP")
 	}
-
+	
 	// Conectar ao servidor TCP na porta 8080
 	conn, err := net.DialTCP("tcp", nil, r)
 	if err != nil {
@@ -46,17 +55,44 @@ func main() {
 		for j := 0; j < numRequests; j++ {
 			start := time.Now()
 
-			// Enviar solicitação para o servidor
-			request := "Solicitação do cliente"
-			conn.Write([]byte(request))
+			// Gerador de números aleatórios com base na hora atual
+			rand.Seed(time.Now().UnixNano())
+			// Gerar um número aleatório entre 0 e 149
+			randomNumber := rand.Intn(150)
 
-			// Receber resposta do servidor
-			buffer := make([]byte, 1024)
-			_, err := conn.Read(buffer)
+			// Enviar solicitação para o servidor para retornar um pokemon
+			// Convertendo o número inteiro em um slice de bytes
+			req := make([]byte, 4)
+			req[0] = byte(randomNumber >> 24)
+			req[1] = byte(randomNumber >> 16)
+			req[2] = byte(randomNumber >> 8)
+			req[3] = byte(randomNumber)
+			_, err := conn.Write(req)
 			if err != nil {
-				fmt.Println("Erro ao receber resposta do servidor")
-				return
+				fmt.Println("Erro ao tentar enviar request:", err)
+				os.Exit(0)
 			}
+
+			// Receber resposta do servidor que é um objeto com informações de um pokemon
+			rep := make([]byte, 1024)
+			n, errResp := conn.Read(rep)
+			if errResp != nil {
+				fmt.Println("Erro ao receber resposta do servidor:", errResp)
+				os.Exit(0)
+			}
+
+			// Desserializando a resposta para criar um novo objeto Pokemon
+			var pokemon Pokemon
+			errDess := json.Unmarshal(rep[:n], &pokemon)
+			if errDess != nil {
+				fmt.Println("Erro ao desserializar a resposta do servidor:", errDess)
+				os.Exit(1)
+			}
+
+			// fmt.Printf("Name: %s\n", pokemon.Name)
+			// fmt.Printf("Type: %s\n", pokemon.Type)
+			// fmt.Printf("Level: %d\n", pokemon.Level)
+			// fmt.Println("------------------------")
 
 			// Calcular o tempo de resposta
 			RTT := time.Since(start)
@@ -80,20 +116,45 @@ func main() {
 
 	} else {
 		for j := 0; j < numRequests; j++ {
+			// Gerador de números aleatórios com base na hora atual
+			rand.Seed(time.Now().UnixNano())
+			// Gerar um número aleatório entre 0 e 149
+			randomNumber := rand.Intn(150)
 
-			// Enviar solicitação para o servidor
-			request := "Solicitação do cliente"
-			conn.Write([]byte(request))
-
-			// Receber resposta do servidor
-			buffer := make([]byte, 1024)
-			_, err := conn.Read(buffer)
+			// Enviar solicitação para o servidor para retornar um pokemon
+			// Convertendo o número inteiro em um slice de bytes
+			req := make([]byte, 4)
+			req[0] = byte(randomNumber >> 24)
+			req[1] = byte(randomNumber >> 16)
+			req[2] = byte(randomNumber >> 8)
+			req[3] = byte(randomNumber)
+			_, err := conn.Write(req)
 			if err != nil {
-				fmt.Println("Erro ao receber resposta do servidor")
-				return
+				fmt.Println("Erro ao tentar enviar request:", err)
+				os.Exit(0)
 			}
 
-		}
+			// Receber resposta do servidor que é um objeto com informações de um pokemon
+			rep := make([]byte, 1024)
+			n, errResp := conn.Read(rep)
+			if errResp != nil {
+				fmt.Println("Erro ao receber resposta do servidor:", errResp)
+				os.Exit(0)
+			}
+			
+			// Desserializando a resposta para criar um novo objeto Pokemon
+			var pokemon Pokemon
+			errDess := json.Unmarshal(rep[:n], &pokemon)
+			if errDess != nil {
+				fmt.Println("Erro ao desserializar a resposta do servidor:", errDess)
+				os.Exit(1)
+			}
 
+			// fmt.Printf("Name: %s\n", pokemon.Name)
+			// fmt.Printf("Type: %s\n", pokemon.Type)
+			// fmt.Printf("Level: %d\n", pokemon.Level)
+			// fmt.Println("------------------------")
+
+		}
 	}
 }
