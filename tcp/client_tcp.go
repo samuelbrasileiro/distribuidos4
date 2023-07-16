@@ -6,21 +6,21 @@ package main
 
 import (
 	"fmt"
-	"net"
-	"time"
-	"os"
 	"math"
+	"net"
+	"os"
+	"time"
 )
 
 func main() {
 	args := os.Args[1:2] // Ignorar o primeiro argumento, que é o nome do executável
-	
+
 	// Retorna o endereço do endpoint TCP
 	r, err := net.ResolveTCPAddr("tcp", ":8080")
 	if err != nil {
 		fmt.Println("Erro ao buscar endereço do endpoint TCP")
 	}
-	
+
 	// Conectar ao servidor TCP na porta 8080
 	conn, err := net.DialTCP("tcp", nil, r)
 	if err != nil {
