@@ -8,12 +8,12 @@ import (
 
 func main() {
 	// Defina o número de processos
-	numProcesses := 80
+	numProcesses := 40
 
 	// Iniciar vários processos
 	for i := 0; i < numProcesses; i++ {
 		// No windows é necessário passar o caminho todo, no linux um ./ resolve linux >>>
-		cmd := exec.Command("C:/Users/washi/Documents/Go/distribuidos4/tcp/client_tcp.exe", fmt.Sprintf("%d", i))
+		cmd := exec.Command("./client_tcp", fmt.Sprintf("%d", i))
 
 		// Redirecionar a saída padrão do processo para a saída padrão do programa
 		cmd.Stdout = os.Stdout

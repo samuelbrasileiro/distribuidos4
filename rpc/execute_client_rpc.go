@@ -8,12 +8,12 @@ import (
 
 func main() {
 	// Defina o número de processos
-	numProcesses := 80
+	numProcesses := 1
 
 	// Iniciar vários processos
 	for i := 0; i < numProcesses; i++ {
 		// No windows é necessário passar o caminho todo, no linux um ./ resolve linux >>>
-		cmd := exec.Command("C:/Users/washi/Documents/Go/distribuidos4/rcp/client_rcp.exe", fmt.Sprintf("%d", i))
+		cmd := exec.Command("./client_rpc", fmt.Sprintf("%d", i))
 
 		// Redirecionar a saída padrão do processo para a saída padrão do programa
 		cmd.Stdout = os.Stdout
